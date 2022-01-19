@@ -1,31 +1,25 @@
-// import logo from './logo.svg';
-// import './App.css';
 import { useState, useEffect } from "react";
 import {
   AppBar,
   Button,
+  Paper,
+  Tab,
+  Tabs,
   TextField,
   Toolbar,
   Typography,
+  useTheme,
 } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
 function HomePage() {
   const navigate = useNavigate();
-
-  //   const CLIEND_ID ="1d216c83fada42baa22c9948b537feed"
-  //   const REDIRECT_URL = "http://localhost:3000/"
-  //   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
-  //   const RESPONSE_TYPE = "token"
-
+  
   const [token, setToken] = useState("");
   const [searchKey, setSearchKey] = useState("");
-
-  //   const handleLogout = () => {
-  //     setToken("")
-  //     window.localStorage.removeItem('token')
-  //   }
+  const [myList, setMyList] = useState([])
 
   const handleLogout = () => {
     setToken("");
@@ -42,22 +36,32 @@ function HomePage() {
 
   const handleSearch = async () => {
     console.log(token);
-    const { data } = await axios
-      .get("https://api.spotify.com/v1/search", {
-        headers: {
-          Authorization: `Barer ${token}`,
-        },
-        params: {
-          q: searchKey,
-          type: "artist",
-        }
-      })
-      .then((result) => {
-        console.log(result.data);
-      });
 
-    console.log(data);
+    const API_URL = `https://api.spotify.com/v1/search?query=${encodeURIComponent(
+        searchKey
+      )}&type=album,playlist,artist`;
+
+    const {data} = await axios.get(API_URL, {
+      headers: {
+          Authorization: `Bearer ${token}`
+      }
+  })
+  var temp = data["playlists"]["items"]
+
+  const {albums ,  artists , playlists} = data
+
+
+
+  setMyList(temp)
+  console.log(data);
+    console.log( albums );
+    console.log( artists );
+    console.log( playlists );
   };
+
+  const handleTabChange = (e ,v) => {
+    console.log(v);
+  }
 
   useEffect(() => {
     var to = window.localStorage.getItem("token");
@@ -72,7 +76,7 @@ function HomePage() {
 
   return (
     <div>
-      <AppBar position="fixed">
+      <AppBar position="static">
         <Toolbar>
           <Typography style={{ flex: 1 }}>Stress Relief Player</Typography>
           <Button
@@ -85,8 +89,9 @@ function HomePage() {
         </Toolbar>
       </AppBar>
 
+{/* search line */}
       <div
-        style={{ marginTop: "5%", display: "flex", justifyContent: "center" }}
+        style={{ marginTop: "1%", display: "flex", justifyContent: "center" }}
       >
         <TextField
           style={{ margin: "10px" }}
@@ -103,9 +108,22 @@ function HomePage() {
         </Button>
       </div>
 
-      <div>
-        <h1>result</h1>
-      </div>
+
+{/* tabs */}
+
+<div>
+   
+  <AppBar position="static">
+  <Tabs value={0} onChange={handleTabChange}>
+     <Tab label="Albums"/>
+     <Tab label="Artists"/>
+     <Tab label="Playlist"/>
+   </Tabs>
+  </AppBar>
+
+</div>
+
+
     </div>
   );
 }
