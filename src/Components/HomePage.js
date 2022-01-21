@@ -19,11 +19,11 @@ function HomePage() {
   const [token, setToken] = useState("");
   const [searchKey, setSearchKey] = useState("");
   const [myList, setMyList] = useState([]);
-  const [tabPos, setTabPos] = useState(0);
+  const [tabPos, setTabPos] = useState(2);
 
-  const [albums, setAlbums] = useState({});
-  const [artists, setArtists] = useState({});
-  const [playlists, setPlayLists] = useState({});
+  const [albums, setAlbums] = useState("");
+  const [artists, setArtists] = useState("");
+  const [playlists, setPlayLists] = useState("");
 
   const handleLogout = () => {
     setToken("");
@@ -141,21 +141,54 @@ function HomePage() {
     } */}
         </div>
 
+        {/* album */}
         <TabPanel value={tabPos} index={0}>
-         album
+          <div>
+            {albums === "" ? (
+              <div>No Data</div>
+            ) : (
+              <div>
+                <h1>{albums["href"]}</h1>
+              </div>
+            )}
+          </div>
         </TabPanel>
+
+        {/* artist */}
         <TabPanel value={tabPos} index={1}>
-          artist
+          <div>
+            {artists === "" ? (
+              <div>No Data</div>
+            ) : (
+              <div>
+                <h1>{artists["href"]}</h1>
+              </div>
+            )}
+          </div>
         </TabPanel>
+
+        {/* playlist */}
         <TabPanel value={tabPos} index={2}>
-         Playlist
+          <div>
+            {playlists === "" ? (
+              <div>No Data</div>
+            ) : (
+              <div>
+                <div>
+                  {
+                  playlists["items"]["images"].map( el => (
+                    playlists["items"]["images"]
+                  ))
+                  }
+                </div>
+              </div>
+            )}
+          </div>
         </TabPanel>
       </div>
     </div>
   );
 }
-
-
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
