@@ -13,13 +13,17 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
 function HomePage() {
   const navigate = useNavigate();
-  
+
   const [token, setToken] = useState("");
   const [searchKey, setSearchKey] = useState("");
-  const [myList, setMyList] = useState([])
+  const [myList, setMyList] = useState([]);
+  const [tabPos, setTabPos] = useState(0);
+
+  const [albums, setAlbums] = useState({});
+  const [artists, setArtists] = useState({});
+  const [playlists, setPlayLists] = useState({});
 
   const handleLogout = () => {
     setToken("");
@@ -27,41 +31,45 @@ function HomePage() {
     navigate("/");
   };
 
-//   "album"
-// "artist"
-// "playlist"
-// "track"
-// "show"
-// "episode"
+  //   "album"
+  // "artist"
+  // "playlist"
+  // "track"
+  // "show"
+  // "episode"
 
   const handleSearch = async () => {
     console.log(token);
 
     const API_URL = `https://api.spotify.com/v1/search?query=${encodeURIComponent(
-        searchKey
-      )}&type=album,playlist,artist`;
+      searchKey
+    )}&type=album,playlist,artist`;
 
-    const {data} = await axios.get(API_URL, {
+    const { data } = await axios.get(API_URL, {
       headers: {
-          Authorization: `Bearer ${token}`
-      }
-  })
-  var temp = data["playlists"]["items"]
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    var temp = data["playlists"]["items"];
 
-  const {albums ,  artists , playlists} = data
+    const { albums, artists, playlists } = data;
 
+    setAlbums(albums);
+    setArtists(artists);
+    setPlayLists(playlists);
 
+    setMyList(temp);
 
-  setMyList(temp)
-  console.log(data);
-    console.log( albums );
-    console.log( artists );
-    console.log( playlists );
+    console.log(data);
+    console.log(albums);
+    console.log(artists);
+    console.log(playlists);
   };
 
-  const handleTabChange = (e ,v) => {
+  const handleTabChange = (e, v) => {
     console.log(v);
-  }
+    setTabPos(v);
+  };
 
   useEffect(() => {
     var to = window.localStorage.getItem("token");
@@ -89,12 +97,12 @@ function HomePage() {
         </Toolbar>
       </AppBar>
 
-{/* search line */}
+      {/* search line */}
       <div
         style={{ marginTop: "1%", display: "flex", justifyContent: "center" }}
       >
         <TextField
-          style={{ margin: "10px" }}
+          style={{ margin: "10px", width: "35%" }}
           label="Search"
           variant="outlined"
           value={searchKey}
@@ -108,24 +116,73 @@ function HomePage() {
         </Button>
       </div>
 
+      {/* tabs */}
 
-{/* tabs */}
+      <div>
+        <AppBar position="static">
+          <Tabs
+            value={tabPos}
+            onChange={handleTabChange}
+            centered
+            variant="fullWidth"
+          >
+            <Tab label="Albums" />
+            <Tab label="Artists" />
+            <Tab label="Playlist" />
+          </Tabs>
+        </AppBar>
 
-<div>
-   
-  <AppBar position="static">
-  <Tabs value={0} onChange={handleTabChange}>
-     <Tab label="Albums"/>
-     <Tab label="Artists"/>
-     <Tab label="Playlist"/>
-   </Tabs>
-  </AppBar>
+        <div>
+          {/* {
+      tabPos === 0 && 
+      <div>
+        <h1> "{albums}" </h1>
+      </div>
+    } */}
+        </div>
 
-</div>
-
-
+        <TabPanel value={tabPos} index={0}>
+         album
+        </TabPanel>
+        <TabPanel value={tabPos} index={1}>
+          artist
+        </TabPanel>
+        <TabPanel value={tabPos} index={2}>
+         Playlist
+        </TabPanel>
+      </div>
     </div>
   );
 }
+
+
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`scrollable-auto-tabpanel-${index}`}
+      aria-labelledby={`scrollable-auto-tab-${index}`}
+      {...other}
+    >
+      <div p={3}>{children}</div>
+    </Typography>
+  );
+}
+
+// function TabPanel(props) {
+//   const { children, tabPos, index } = props;
+//   return (
+//     <div>
+//       {tabPos === index && (
+//           <h2> {children} </h2>
+//       )}
+//     </div>
+//   );
+// }
 
 export default HomePage;
